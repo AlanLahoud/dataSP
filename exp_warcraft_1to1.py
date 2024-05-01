@@ -276,7 +276,7 @@ for epochs in range(0,N_EPOCHS):
         else:
             perc_correct_best = perc_correct
             not_best_count_accum = 0
-            _ = utils.check_or_create_folder("saved_models")
+            _ = data_utils.check_or_create_folder("saved_models")
             torch.save(model.state_dict(), model_path)
             
         print(epochs, 
