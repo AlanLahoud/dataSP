@@ -319,13 +319,11 @@ for epochs in range(0,N_EPOCHS):
             torch.tensor(beta_smooth),
             d_large
         ) 
-
-        probs_pred_val = probs_pred_val.to(dev)
         
         mib_val = data_utils.get_m_inter_batch(
             node_idx_sequence_trips_val, 
             np.expand_dims(np.arange(0,N_val), 1), M, M)
-        mib_val = torch.tensor(mib_val, dtype=torch.float32).to(dev)
+        mib_val = torch.tensor(mib_val, dtype=torch.float32)
         m_inter_total_val = mib_val.sum(1)/mib_val.sum(1).sum(-1).unsqueeze(-1)
 
         mask_val = ~torch.isnan(m_inter_total_val)
