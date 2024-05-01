@@ -41,7 +41,7 @@ def parse_arguments():
                         help='Noise in data')
     
     parser.add_argument('--perc_end_nodes_seen', type=float, default=0.5, 
-                        help='Percentage of end nodes seen')
+                        help='Percentage of end nodes observed (train)')
 
     parser.add_argument('--N_EPOCHS', type=int, default=100, 
                         help='N EPOCHS train')
@@ -65,7 +65,7 @@ def parse_arguments():
                         help='How many paths in one floyd warshall (factor)')
         
     parser.add_argument('--load_model', type=int, default=0, 
-                        help='Load previous model?')
+                        help='Load previous saved model?')
         
     parser.add_argument('--Vs', type=float, default=-1, 
                         help='Nr sampling nodes')
@@ -240,7 +240,6 @@ for epochs in range(0,N_EPOCHS):
     
     loss_batch_avg = 0
     
-    #for batch in tqdm(range(0, N_batches)):
     for batch in range(0, N_batches):
     
         if bool_scale:
@@ -276,8 +275,6 @@ for epochs in range(0,N_EPOCHS):
         utils.shuffle_nodes_order(
             Vs, M_Y_pred_selected, M_indices_selected_mapped, selected_trips)
 
-        #import pdb
-        #pdb.set_trace()
         # Inference: Compute P
         probs_pred = datasp.datasp(
             M_Y_pred_selected_shuf,        
@@ -354,9 +351,12 @@ for epochs in range(0,N_EPOCHS):
         
 
 # Test results without noise
+prior_M = prior_M.cpu()
+M_indices = M_indices.cpu()
+
 _, _, _, _, _, dY_test_mean, _, _, M_Y_mean_test =\
 data_utils.generate_synthetic_data(
-        1, 1, N_test, 0.0, E, M_indices, prior_M, seed_n)        
+        1, 1, N_test, 0.0, E, M_indices, prior_M, seed_n) 
 with torch.no_grad():        
     end_to_end_nodes_test = \
     data_utils.gen_source_end_nodes_train(
