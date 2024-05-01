@@ -6,6 +6,7 @@ import torch
 from scipy.sparse.csgraph import dijkstra as dij
 from scipy.sparse import csr_matrix
 import heapq
+import datasp
 
 
 
@@ -127,34 +128,45 @@ def select_Ms_from_selected_idx_and_trips(
 
         M_indices_to_check = torch.cartesian_prod(n_to_node, node_to_n)      
 
-        M_Y_pred_new = smooth_dp_utils.remove_node_and_adjust_vectorized(
+        M_Y_pred_new = datasp.remove_node_and_adjust_vectorized(
             M_Y_pred_new, n, M_indices_to_check, beta)
 
-    idx_combinations = torch.cartesian_prod(nodes_selected, nodes_selected, nodes_selected)
-    idx_combinations_2 = torch.cartesian_prod(nodes_selected, nodes_selected)
+    idx_combinations = torch.cartesian_prod(
+        nodes_selected, nodes_selected, nodes_selected)
+    idx_combinations_2 = torch.cartesian_prod(
+        nodes_selected, nodes_selected)
 
-    M_Y_pred_selected = M_Y_pred_new[:, idx_combinations_2[:,0], idx_combinations_2[:,1]].clone()
+    M_Y_pred_selected = M_Y_pred_new[:, idx_combinations_2[:,0], 
+                                     idx_combinations_2[:,1]].clone()
 
     M_Y_pred_selected = M_Y_pred_selected.reshape(M_Y_pred.shape[0], Vs, Vs)
 
-    M_indices_selected_mapped = torch.argwhere((M_Y_pred_selected<d_large).sum(0)>0)
-    M_indices_selected = M_indices[torch.isin(M_indices, nodes_selected.to(dev)).sum(1) == 2]
+    M_indices_selected_mapped = torch.argwhere(
+        (M_Y_pred_selected<d_large).sum(0)>0)
+    M_indices_selected = M_indices[torch.isin(
+        M_indices, nodes_selected.to(dev)).sum(1) == 2]
 
     return M_Y_pred_selected, M_indices_selected_mapped
 
 
 
-def shuffle_nodes_order(Vs, M_Y_pred_selected, M_indices_selected_mapped, selected_trips):
+def shuffle_nodes_order(
+    Vs, M_Y_pred_selected, M_indices_selected_mapped, 
+    selected_trips):
         k_nodes = torch.arange(Vs)
         k_nodes_shufled = k_nodes[torch.randperm(Vs)]
-        shuffle_k_dict = {int(k_nodes_shufled[i]):int(k_nodes[i]) for i in range(Vs)} 
+        shuffle_k_dict = {
+            int(k_nodes_shufled[i]):int(k_nodes[i]) for i in range(Vs)} 
 
         # We want to remove bias of node ordering
-        M_Y_pred_selected_shuf = M_Y_pred_selected[:,k_nodes_shufled][:, :, k_nodes_shufled]     
+        M_Y_pred_selected_shuf = M_Y_pred_selected[
+            :,k_nodes_shufled][:, :, k_nodes_shufled]     
         M_indices_selected_mapped_shuf = M_indices_selected_mapped.clone()
         for key, value in shuffle_k_dict.items():
-            M_indices_selected_mapped_shuf[M_indices_selected_mapped == key] = value           
-        selected_trips_shuf = [[shuffle_k_dict[p] for p in sublist] for sublist in selected_trips] 
+            M_indices_selected_mapped_shuf[
+                M_indices_selected_mapped == key] = value           
+        selected_trips_shuf = [[
+            shuffle_k_dict[p] for p in sublist] for sublist in selected_trips] 
         
         return M_Y_pred_selected_shuf, M_indices_selected_mapped_shuf, selected_trips_shuf
     
