@@ -313,13 +313,15 @@ for epochs in range(0,N_EPOCHS):
         M_Y_pred_val = data_utils.costs_to_matrix(prior_M, M_indices, dY_val)
 
         probs_pred_val = datasp.datasp(
-            M_Y_pred_val,
-            M_indices,
-            dev,
+            M_Y_pred_val.to('cpu'),
+            M_indices.to('cpu'),
+            'cpu',
             torch.tensor(beta_smooth),
             d_large
         ) 
 
+        probs_pred_val = probs_pred_val.to(dev)
+        
         mib_val = data_utils.get_m_inter_batch(
             node_idx_sequence_trips_val, 
             np.expand_dims(np.arange(0,N_val), 1), M, M)
