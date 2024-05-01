@@ -34,7 +34,7 @@ def parse_arguments():
                         help='Learning Rate')
     parser.add_argument('--N_batches', type=int, default=30, 
                         help='N Batches in one Epoch')
-    parser.add_argument('--bs_X', type=int, default=32, 
+    parser.add_argument('--bs_X', type=int, default=24, 
                         help='How many floyd warshalls in a batch')
     
     parser.add_argument('--seed_n', type=int, default=0)   
