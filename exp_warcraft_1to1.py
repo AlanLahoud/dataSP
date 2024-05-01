@@ -242,7 +242,7 @@ for epochs in range(0,N_EPOCHS):
         print('Batch', batch, round(loss_main.item(), 3), 
               '\tTime: ', round(time.time() - start_time, 3))
         
-        loss_batch_avg += (loss_mse/N_batches).detach()
+        loss_batch_avg += (loss_main/N_batches).detach()
         
         
     with torch.no_grad():
