@@ -30,9 +30,9 @@ def parse_arguments():
     
     parser.add_argument('--beta', type=float, default=100., 
                         help='Beta Smooth')
-    parser.add_argument('--lr', type=float, default=0.0002, 
+    parser.add_argument('--lr', type=float, default=0.001, 
                         help='Learning Rate')
-    parser.add_argument('--N_batches', type=int, default=30, 
+    parser.add_argument('--N_batches', type=int, default=100, 
                         help='N Batches in one Epoch')
     parser.add_argument('--bs_X', type=int, default=24, 
                         help='How many floyd warshalls in a batch')
