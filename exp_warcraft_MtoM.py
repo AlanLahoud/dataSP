@@ -315,7 +315,7 @@ for epochs in range(0,N_EPOCHS):
         path_pred = datasp.datasp(
             M_pred.detach().cpu().numpy(),
             np.repeat(np.array([[0,N**2-1]]),
-                      N_eval, 0))
+                      N_eval, 0), 'cpu')
 
         path_pred_map_all = torch.zeros((N_eval, N**2))
         for i in range(0, N_eval):
