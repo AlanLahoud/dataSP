@@ -304,7 +304,7 @@ for epochs in range(0,N_EPOCHS):
         loss_main.backward()
         opt.step()
         
-        loss_batch_avg += (loss_mse/N_batches).detach()
+        loss_batch_avg += (loss_main/N_batches).detach()
     
     
     with torch.no_grad():
