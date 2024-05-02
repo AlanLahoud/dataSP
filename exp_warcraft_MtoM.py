@@ -312,8 +312,10 @@ for epochs in range(0,N_EPOCHS):
         nodes_pred = model(val_inputs_tensor.to(dev)).clip(0.001)
         M_pred = utils_ww.nodes_to_M_batch(nodes_pred)
 
-        path_pred = smooth_dp_utils.batch_dijkstra(M_pred.detach().cpu().numpy(), 
-                                                   np.repeat(np.array([[0,N**2-1]]), N_eval, 0))
+        path_pred = datasp.datasp(
+            M_pred.detach().cpu().numpy(),
+            np.repeat(np.array([[0,N**2-1]]),
+                      N_eval, 0))
 
         path_pred_map_all = torch.zeros((N_eval, N**2))
         for i in range(0, N_eval):
