@@ -1,8 +1,12 @@
+import numpy as np
 import torch
 import torch.nn as nn
 from collections import deque
 import torchvision
 from math import sqrt
+import comb_modules.dijkstra as dij
+import multiprocessing
+from tqdm import tqdm
 
 
 def get_M_indices(N):
@@ -127,3 +131,57 @@ def nodes_to_M_batch(nodes):
                                          torch.div(J_masked, N, rounding_mode='trunc'), 
                                          J_masked % N]   
     return M_batch
+
+
+
+def gen_s_t_nodes(N):
+    r = np.random.random()
+    if r<0.5:
+        s = (0, np.random.randint(0,N))
+        t = (N-1, np.random.randint(0,N))
+    else:
+        s = (np.random.randint(0,N), 0)
+        t = (np.random.randint(0,N), N-1)
+        
+    return s, t
+
+
+
+def worker(weights_samp, sn, tn):
+    if weights_samp.ndim != 2:
+        raise ValueError(f"Expected 2D array for weights_samp, got {weights_samp.ndim}D")
+    return dij.dijkstra((weights_samp, 
+                              sn, tn)).shortest_path
+
+
+def sp_dij(weights, s_t_nodes, paths_per_img=30):
+        
+        
+    n_imgs = weights.shape[0]
+    img_size = weights.shape[1]
+    
+    shortest_paths = np.zeros((n_imgs, paths_per_img, img_size, img_size))
+  
+    tasks = [(weights[samp], s_t_nodes[samp,p,0], s_t_nodes[samp,p,1]) \
+             for samp in range(n_imgs) for p in range(paths_per_img)]
+    
+    pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
+    results = pool.starmap(worker, tqdm(tasks))
+    pool.close()
+    pool.join()
+    
+    loop = [(samp, p) for samp in range(n_imgs) for p in range(paths_per_img)]
+    for i, (samp, p) in enumerate(loop):
+        shortest_paths[samp, p, :, :] = results[i]
+        
+    return shortest_paths
+
+
+
+def perturb_weights(weights, noise=0.5):
+    weights_rand = weights*(
+        1 + 0.5*np.random.randn(
+            weights.shape[0], 
+            weights.shape[1], 
+            weights.shape[2])).clip(0.1)
+    return weights_rand
