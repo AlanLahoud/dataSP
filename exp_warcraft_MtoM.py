@@ -159,7 +159,8 @@ def process_path_train(i_p):
 
 indices = [(i, p) for i in range(0, N_train) for p in range(paths_per_img)]
 with multiprocessing.Pool() as pool:
-    true_paths_nodes = list(tqdm(pool.imap(process_path_train, indices), total=len(indices)))
+    true_paths_nodes = list(tqdm(pool.imap(process_path_train, indices), 
+                                 total=len(indices)))
 
 
 #true_paths_nodes = []
@@ -193,7 +194,8 @@ def cross_entropy_cont(target, prediction):
     return criterion(torch.log(prediction + 0.00001), target).sum(-1)
 
 
-model_path = f'saved_models/safw_ww_MtoM_{N}_{suffix_noise}_{beta_smooth}_{bs_X}_{lr}_{seed_n}.pkl'
+model_path =\
+f'saved_models/MtoM_{N}_{suffix_noise}_{beta_smooth}_{bs_X}_{lr}_{seed_n}.pkl'
 print('Model path:', model_path)
 if load_model:
     try:
@@ -232,7 +234,8 @@ not_best_count_accum = 0
 loss_batch_avg_best = torch.inf
 perc_correct_best = 0.
 
-scheduler = lr_scheduler.LinearLR(opt, start_factor=1.0, end_factor=0.01, total_iters=50)
+scheduler = lr_scheduler.LinearLR(opt, 
+                                  start_factor=1.0, end_factor=0.01, total_iters=50)
 
 
 
@@ -245,8 +248,10 @@ for epochs in range(0,N_EPOCHS):
         start_time = time.time()        
 
         with torch.no_grad():
-            selected_indexes, selected_trips, nodes_selected, nodes_excluded = utils.selected_trips_and_idx(
-                true_paths_nodes, M_indices, elements, frequencies, Vs, N**2)
+            selected_indexes, selected_trips, nodes_selected, nodes_excluded =\
+            utils.selected_trips_and_idx(
+                true_paths_nodes, M_indices, 
+                elements, frequencies, Vs, N**2)
             if selected_indexes == None:
                 continue
 
@@ -268,18 +273,23 @@ for epochs in range(0,N_EPOCHS):
         nodes_pred_batch = model(X_batch).clip(0.001)
         M_pred_batch = utils_ww.nodes_to_M_batch(nodes_pred_batch)
         
-        M_Y_pred_selected, M_indices_selected_mapped = utils.select_Ms_from_selected_idx_and_trips(
+        M_Y_pred_selected, M_indices_selected_mapped =\
+        utils.select_Ms_from_selected_idx_and_trips(
                 M_pred_batch, Vs, M_indices, 
-            nodes_excluded, nodes_selected, torch.tensor(beta_smooth), dev)
+            nodes_excluded, nodes_selected, 
+            torch.tensor(beta_smooth), dev)
         
         
         M_Y_pred_selected_shuf, M_indices_selected_mapped_shuf, selected_trips_shuf =\
         utils.shuffle_nodes_order(
-            Vs, M_Y_pred_selected, M_indices_selected_mapped, selected_trips)
+            Vs, M_Y_pred_selected, M_indices_selected_mapped, 
+            selected_trips)
         
         
         probs_pred = datasp.datasp(
-            M_Y_pred_selected_shuf, M_indices_selected_mapped_shuf, dev, beta_smooth)
+            M_Y_pred_selected_shuf, 
+            M_indices_selected_mapped_shuf, 
+            dev, beta_smooth)
         
         idx_batch_paths = np.searchsorted(selected_indexes, idcs_paths)
         
@@ -291,7 +301,8 @@ for epochs in range(0,N_EPOCHS):
         
         m_inter_total = torch.zeros(bs_X, Vs, Vs, Vs)
         for i, p in zip(sel_imgs_idx_sorted, idx_batch_paths):  
-            m_inter_total[i] += data_utils.get_m_inter(selected_trips_shuf[p], Vs, Vs)
+            m_inter_total[i] += data_utils.get_m_inter(
+                selected_trips_shuf[p], Vs, Vs)
 
         m_inter_total = (m_inter_total/m_inter_total.sum(-1).unsqueeze(-1)).to(dev)
         
@@ -327,7 +338,8 @@ for epochs in range(0,N_EPOCHS):
 
         cost_pred = (path_pred_map_all*val_weights[:N_eval]).sum(-1).sum(-1)
 
-        cost_true = (val_labels.astype(float)[:N_eval]*val_weights[:N_eval]).sum(-1).sum(-1)
+        cost_true = (
+            val_labels.astype(float)[:N_eval]*val_weights[:N_eval]).sum(-1).sum(-1)
 
         perc_correct = (cost_pred - cost_true < 0.001).sum()/N_eval
         perc_correct_2 = (cost_pred - cost_true < 0.1).sum()/N_eval
