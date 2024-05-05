@@ -180,7 +180,7 @@ def sp_dij(weights, s_t_nodes, paths_per_img=30):
 
 def perturb_weights(weights, noise=0.5):
     weights_rand = weights*(
-        1 + 0.5*np.random.randn(
+        1 + noise*np.random.randn(
             weights.shape[0], 
             weights.shape[1], 
             weights.shape[2])).clip(0.1)

@@ -238,7 +238,6 @@ scheduler = lr_scheduler.LinearLR(opt,
                                   start_factor=1.0, end_factor=0.01, total_iters=50)
 
 
-
 for epochs in range(0,N_EPOCHS):
 
     loss_batch_avg = 0
