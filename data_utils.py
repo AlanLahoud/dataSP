@@ -213,3 +213,49 @@ def get_m_inter_batch(node_idx_sequence_trips, idcs_batch, V, Vk):
             m_inter_batch[i,j,:,:,:] = get_m_inter(node_idx_sequence_trips[id_trip], V, Vk)
             
     return m_inter_batch
+
+
+
+def haversine(lat1, lon1, lat2, lon2):
+    R = 6371.0  # Radius of the Earth in kilometers
+    dlat = np.radians(lat2 - lat1)
+    dlon = np.radians(lon2 - lon1)
+    a = np.sin(dlat / 2) ** 2 + np.cos(np.radians(lat1)) \
+    * np.cos(np.radians(lat2)) * np.sin(dlon / 2) ** 2
+    c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))
+    distance = R * c
+    return distance
+
+def create_prior_distance_matrix(nodes_df, df_edges):
+    nodes_df = nodes_df.sort_values(
+        by='node_sorted').reset_index(drop=True)
+    sorted_node_ids = np.sort(nodes_df['node_sorted'].values)
+
+    n = len(sorted_node_ids)
+    adj_matrix_sorted = np.zeros((n, n), dtype=int)
+
+    for _, row in df_edges.iterrows():
+        i = row['node_from']
+        j = row['node_to']
+        adj_matrix_sorted[i, j] = 1
+
+    distance_matrix = np.full((n, n), 5000.)
+
+    for i in range(n):
+        for j in range(n):
+            if adj_matrix_sorted[i, j] == 1:
+                lat1, lon1 = nodes_df.loc[i, ['node_lat', 'node_lon']]
+                lat2, lon2 = nodes_df.loc[j, ['node_lat', 'node_lon']]
+                distance_matrix[i, j] = haversine(lat1, lon1, lat2, lon2)
+                
+    return adj_matrix_sorted, distance_matrix
+
+def get_prior_and_M_indices(nodes, edges):
+    bin_M, prior_M = create_prior_distance_matrix(nodes, edges)
+    prior_M = torch.tensor(prior_M, dtype=torch.float32)
+    E = int(bin_M.sum())
+    M_indices = np.zeros((E, 2))
+    M_indices[:,0], M_indices[:,1] = np.where(bin_M==1)
+    M_indices = torch.tensor(M_indices, dtype=torch.long)
+    edges_prior = prior_M[M_indices[:, 0], M_indices[:, 1]]
+    return prior_M, edges_prior, M_indices
