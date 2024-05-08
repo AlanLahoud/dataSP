@@ -20,7 +20,7 @@ The repository contains four main experiments:
 ## 2. Warcraft Maps: Single Source-Target
 
 - **File to Run**: `exp_warcraft_1to1.py`
-- **Data**: Utilizes data from the Warcraft map editor, as referenced in [PAPER 1, PAPER 2, PAPER 3]. We use 144x144 images and 18x18 grid map layers. Please paste the data files to `./data_warcraft/18x18`.
+- **Data**: Utilizes data from the Warcraft map editor, as referenced in [PAPER 1](https://arxiv.org/abs/1912.02175) and [PAPER 2](https://arxiv.org/abs/2002.08676). We use 144x144 images and 18x18 grid map layers. Please paste the data files to `./data_warcraft/18x18`.
 - **Instructions**: DataSP may require additional time to achieve accuracy levels above 95% due to its inefficiencies in single source-target configurations. Keep the same `argparse` settings for consistent results with those reported.
 
 ## 3. Warcraft Maps: Many Source-Targets
