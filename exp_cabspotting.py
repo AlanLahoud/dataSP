@@ -38,7 +38,7 @@ def parse_arguments():
                         help='Learning Rate')
     parser.add_argument('--N_batches', type=int, default=100, 
                         help='N Batches in one Epoch')
-    parser.add_argument('--bs_X', type=int, default=16, 
+    parser.add_argument('--bs_X', type=int, default=12, 
                         help='How many floyd warshalls in a batch')
     parser.add_argument('--ps_f', type=float, default=0.01, 
                         help='How many paths in one floyd warshall (factor)')
