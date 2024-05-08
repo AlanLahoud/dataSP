@@ -25,7 +25,7 @@ import time
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Set parameters for the program.')
 
-    parser.add_argument('--Vs', type=float, default=70, 
+    parser.add_argument('--Vs', type=float, default=40, 
                         help='Nr sampling nodes')
     parser.add_argument('--N_EPOCHS', type=int, default=100, 
                         help='N EPOCHS train')
@@ -38,13 +38,16 @@ def parse_arguments():
                         help='Learning Rate')
     parser.add_argument('--N_batches', type=int, default=100, 
                         help='N Batches in one Epoch')
-    parser.add_argument('--bs_X', type=int, default=8, 
+    parser.add_argument('--bs_X', type=int, default=16, 
                         help='How many floyd warshalls in a batch')
     parser.add_argument('--ps_f', type=float, default=0.01, 
                         help='How many paths in one floyd warshall (factor)')
     
     parser.add_argument('--load_model', type=int, default=0, 
-                        help='Load previous model?')        
+                        help='Load previous model?')  
+    
+    parser.add_argument('--dev', type=str, default='cpu', 
+                        help='Device to use')
     
     
     return parser.parse_args()
@@ -64,7 +67,8 @@ ps_f = args.ps_f
 
 load_model = args.load_model
 
-dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+dev = args.dev
+
 path_data = './cabspotting_preprocessing/'
 
 d_large = torch.tensor(2500.)
