@@ -1,6 +1,6 @@
 # DataSP Algorithm Experiments Repository
 
-This repository hosts a series of experiments designed to test the DataSP algorithm, as proposed in the paper [DataSP: A Differential All-to-All Shortest Path Algorithm for Learning Costs and Predicting Paths with Context](https://arxiv.org/abs/1912.02175). The DataSP algorithm represents a differentiable adaptation of the Floyd-Warshall all-to-all Shortest Path algorithm, tailored specifically for path and destination prediction tasks. Below you will find detailed descriptions and instructions for each experiment.
+This repository hosts a series of experiments designed to test the DataSP algorithm, as proposed in the paper [DataSP: A Differential All-to-All Shortest Path Algorithm for Learning Costs and Predicting Paths with Context](https://arxiv.org/abs/2405.04923). The DataSP algorithm represents a differentiable adaptation of the Floyd-Warshall all-to-all Shortest Path algorithm, tailored specifically for path and destination prediction tasks. Below you will find detailed descriptions and instructions for each experiment.
 
 ## Experiments Overview
 
